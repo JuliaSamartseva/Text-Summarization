@@ -1,0 +1,15 @@
+{
+  "manifest_version": 2,
+  "name": "FindText",
+  "version": "1",
+  "permissions": ["activeTab", "GOOGLE_CLOUD_FUNCTION_URL"],
+  "description": "Highlights summarized text that is related to the given query",
+  "icons": {"16": "icon16.png",
+            "64": "icon64.png"},
+  "browser_action": {
+   "default_icon": "tab-icon.png",
+   "default_title": "Highlight text related to the given query",
+   "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab"]
+}
