@@ -7,6 +7,16 @@ from lsa_summarizer import LsaSummarizer
 import json
 from nltk.corpus import stopwords
 
+from google.cloud import logging as cloudlogging
+import logging
+
+lg_client = cloudlogging.Client()
+
+lg_handler = lg_client.get_default_handler()
+cloud_logger = logging.getLogger("cloudLogger")
+cloud_logger.setLevel(logging.INFO)
+cloud_logger.addHandler(lg_handler)
+
 
 def read_article(file_json):
     article = ''
@@ -22,6 +32,7 @@ def read_article(file_json):
 def generate_summary(request):
     # Set CORS headers for the preflight request
     if request.method == 'OPTIONS':
+        cloud_logger.info("Received preflight request")
         # Allows GET requests from any origin with the Content-Type
         # header and caches preflight response for an 3600s
         headers = {
@@ -34,6 +45,7 @@ def generate_summary(request):
         return ('', 204, headers)
 
     # Set CORS headers for the main request
+    cloud_logger.info("Received main request")
     headers = {
         'Access-Control-Allow-Origin': '*'
     }
@@ -44,5 +56,6 @@ def generate_summary(request):
     summarizer.stop_words = stopwords.words('english')
 
     summary = summarizer(sentences, 3)
+    cloud_logger.info("Finished summarization")
 
     return (json.dumps(summary), 200, headers)
