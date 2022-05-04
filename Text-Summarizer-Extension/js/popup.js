@@ -4,12 +4,12 @@ function summarize() {
             activeTabs.map(function (tab) {
                 chrome.scripting.executeScript({
                     target: {tabId: tab.id, allFrames: false},
-                    files: ['jquery.js'],
+                    files: ['js/jquery.js'],
                 },
                 () => {
                     chrome.scripting.executeScript({
                         target: {tabId: tab.id, allFrames: false},
-                        files: ['content.js'],
+                        files: ['js/content.js'],
                     });
                 });
             });
