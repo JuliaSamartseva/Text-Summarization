@@ -1,35 +1,72 @@
 body {
-	width: 200px; 
-	overflow:hidden;
+     width: 400px;
+     background: linear-gradient(45deg, #4ca1af, #c4e0e5);
+     font-family: 'Montserrat', sans-serif;
+     overflow:hidden;
 }
-
-button {
-     background:none;
-     color:inherit;
-     border:none; 
-     font: inherit;
-     padding: 0;
-     margin: 0;
-     cursor: pointer;
+ container {
+     position: absolute;
+     transform: translate(-40%,-40%);
+     top: 50%;
+     left: 50%;
 }
-
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
+ .main {
+     font-weight: 800;
+     color: black;
+     opacity: 0.7;
+     font-size: 1.4rem;
+     margin-top: 0;
+     margin-bottom: 20px;
+     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
-
-li a {
-  display: block;
-  padding: 8px 16px;
-  text-decoration: none;
+ form {
+     padding: 3em;
+     height: 320px;
+     border-radius: 20px;
+     border-left: 1px solid rgba(255,255,255,0.3);
+     border-top: 1px solid rgba(255,255,255,0.3);
+     box-shadow: 20px 20px 40px -6px rgba(0,0,0,0.2);
+     text-align: center;
+     position: relative;
+     transition: all 0.2s ease-in-out;
 }
-
-li a:hover {
-  background-color: #555;
-  color: white;
-  cursor: pointer;
+ input {
+     background: transparent;
+     width: 200px;
+     padding: 1em;
+     margin-bottom: 2em;
+     border: none;
+     border-radius: 5000px;
+     backdrop-filter: blur(5px);
+     box-shadow: 4px 4px 60px rgba(0,0,0,0.2);
+     color: #fff;
+     font-family: Montserrat, sans-serif;
+     font-weight: 500;
+     transition: all 0.2s ease-in-out;
+     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
 }
-
-
+ .button {
+     background: transparent;
+     width: 200px;
+     padding: 1em;
+     margin-bottom: 2em;
+     border: none;
+     border-radius: 5000px;
+     backdrop-filter: blur(5px);
+     box-shadow: 4px 4px 60px rgba(0,0,0,0.2);
+     color: #fff;
+     font-family: Montserrat, sans-serif;
+     font-weight: 500;
+     transition: all 0.2s ease-in-out;
+     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+ .button:hover {
+     background-color: #4a79a1;
+}
+ ::placeholder {
+     font-family: Montserrat, sans-serif;
+     font-weight: 400;
+     color: #fff;
+     text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+}
  
