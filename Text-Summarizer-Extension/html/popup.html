@@ -9,9 +9,24 @@
             <p class="main">Find Text</p>
             <p>Please input the sentence size of result summary and the query it has to relate to. Leave the query field blank if the summary needs to be general.</p>
             <p>In several seconds the sentences will be highlighted on the website.</p>
-            <input class="input" type="text" placeholder="Query"><br>
-            <input type="number" min="3" placeholder="Size of result"><br>
-            <input class="button" type="button" id="summarize_text" value="Search"></button>
+            <input 
+                class="input" 
+                type="text" 
+                id="query"
+                placeholder="Query">
+            <br>
+            <input 
+                type="number" 
+                id="number"
+                min="3" 
+                placeholder="Size of result">
+            <br>
+            <button 
+                class="button" 
+                type="button" 
+                id="summarize_text" 
+                value="Search">
+            </button>
             <script type="text/javascript" src="../js/popup.js" charset="utf-8"></script>
         </form>
     </div>
