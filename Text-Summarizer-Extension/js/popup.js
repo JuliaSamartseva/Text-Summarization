@@ -17,4 +17,5 @@ function summarize() {
     });
 }
 
+// Call a script summarization function in the current tab when the button is clicked.
 document.getElementById('summarize_text').addEventListener('click', summarize);

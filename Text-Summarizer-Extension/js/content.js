@@ -1,4 +1,4 @@
-alert("Generating summary highlights. This may take up to 30 seconds depending on length of article.");
+alert("Generating summary. The text will be highlighted on the page. It may take several seconds.");
 
 function unicodeToChar(text) {
 	return text.replace(/\\u[\dA-F]{4}/gi, 
@@ -7,7 +7,7 @@ function unicodeToChar(text) {
 	      });
 }
 
-// capture all text
+// Capture all text
 var textToSend = document.body.innerText;
 
 
@@ -20,6 +20,7 @@ fetch('https://us-central1-query-summarization.cloudfunctions.net/function-3', {
 .then(data => { return data.json() })
 .then(res => { 
 	$.each(res, function( index, value ) {
+        // Highlight summary sentences that the algorithm has identified.
         var source_document = document.body.innerHTML;
         value = value.replace(/(\s+)/,"(<[^>]+>)*$1(<[^>]+>)*");
         var pattern = new RegExp("("+value+")", "i");
