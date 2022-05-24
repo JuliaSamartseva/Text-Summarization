@@ -28,6 +28,13 @@ def read_article(file_json):
 
     return article
 
+def summarize_article(sentences):
+    summarizer = LsaSummarizer()
+    summarizer.stop_words = stopwords.words('english')
+    summary = summarizer(sentences, query, 3)
+    cloud_logger.info("Finished summarization")
+    return summary
+
 
 def generate_summary(request):
     # Set CORS headers for the preflight request
@@ -50,12 +57,7 @@ def generate_summary(request):
         'Access-Control-Allow-Origin': '*'
     }
 
-    summarizer = LsaSummarizer()
     request_json = request.get_json(silent=True)
     sentences = read_article(request_json)
-    summarizer.stop_words = stopwords.words('english')
 
-    summary = summarizer(sentences, query, 3)
-    cloud_logger.info("Finished summarization")
-
-    return (json.dumps(summary), 200, headers)
+    return json.dumps(summarize_article(sentences)), 200, headers
