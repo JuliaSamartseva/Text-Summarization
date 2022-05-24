@@ -55,7 +55,7 @@ def generate_summary(request):
     sentences = read_article(request_json)
     summarizer.stop_words = stopwords.words('english')
 
-    summary = summarizer(sentences, 3)
+    summary = summarizer(sentences, query, 3)
     cloud_logger.info("Finished summarization")
 
     return (json.dumps(summary), 200, headers)

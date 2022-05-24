@@ -29,8 +29,7 @@ SentenceInfo = namedtuple("SentenceInfo", ("sentence", "order", "rating",))
 
 
 class BaseSummarizer(object):
-
-    def __call__(self, document, sentences_count):
+    def __call__(self, document, query, sentences_count):
         raise NotImplementedError("This method should be overriden in subclass")
 
     @staticmethod
@@ -49,10 +48,12 @@ class BaseSummarizer(object):
 
         # sort sentences by rating in descending order
         infos = sorted(infos, key=attrgetter("rating"), reverse=True)
-        # get `count` first best rated sentences
+
+        # get first best rated sentences
         if not isinstance(count, ItemsCount):
             count = ItemsCount(count)
         infos = count(infos)
+
         # sort sentences by their order in document
         infos = sorted(infos, key=attrgetter("order"))
 

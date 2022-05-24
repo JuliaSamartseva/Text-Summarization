@@ -5,9 +5,10 @@ import numpy
 
 from warnings import warn
 from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.corpus import stopwords
 from numpy.linalg import svd as singular_value_decomposition
 from base_summarizer import BaseSummarizer
-from nltk.corpus import stopwords
+from sentence_similarity import SentenceSimilarity
 
 
 class LsaSummarizer(BaseSummarizer):
@@ -24,7 +25,7 @@ class LsaSummarizer(BaseSummarizer):
     def stop_words(self, words):
         self._stop_words = words
 
-    def __call__(self, document, sentences_count):
+    def __call__(self, document, query, sentences_count):
         dictionary = self._create_dictionary(document)
 
         if not dictionary:
@@ -32,17 +33,22 @@ class LsaSummarizer(BaseSummarizer):
 
         sentences = sent_tokenize(document)
 
-        matrix = self._create_matrix(document, dictionary)
-        matrix = self._compute_term_frequency(matrix)
+        # If the query is not empty, module with the search for the most relevant sentences is started.
+        if query:
+            sentence_similarity = SentenceSimilarity(sentences)
+            sentences = sentence_similarity.get_most_similar(query, 1)
+
+        matrix = LsaSummarizer._create_matrix(sentences, dictionary)
+        matrix = LsaSummarizer._compute_term_frequency(matrix)
+
+        # Singular Value Decomposition
         u, sigma, v = singular_value_decomposition(matrix, full_matrices=False)
 
         ranks = iter(self._compute_ranks(sigma, v))
-        return self._get_best_sentences(sentences, sentences_count,
+        return LsaSummarizer._get_best_sentences(sentences, sentences_count,
                                         lambda s: next(ranks))
 
     def _create_dictionary(self, document):
-        """Creates mapping key = word, value = row index"""
-
         words = word_tokenize(document)
         words = tuple(words)
 
@@ -52,12 +58,8 @@ class LsaSummarizer(BaseSummarizer):
 
         return dict((w, i) for i, w in enumerate(unique_words))
 
-    def _create_matrix(self, document, dictionary):
-        """
-        Creates matrix of shape where cells
-        contains number of occurences of words (rows) in senteces (cols).
-        """
-        sentences = sent_tokenize(document)
+    @staticmethod
+    def _create_matrix(sentences, dictionary):
         words_count = len(dictionary)
         sentences_count = len(sentences)
         if words_count < sentences_count:
@@ -71,24 +73,14 @@ class LsaSummarizer(BaseSummarizer):
         for col, sentence in enumerate(sentences):
             words = word_tokenize(sentence)
             for word in words:
-                # only valid words is counted (not stop-words, ...)
                 if word in dictionary:
                     row = dictionary[word]
                     matrix[row, col] += 1
 
         return matrix
 
-    def _compute_term_frequency(self, matrix, smooth=0.4):
-        """
-        Computes TF metrics for each sentence (column) in the given matrix and  normalize
-        the tf weights of all terms occurring in a document by the maximum tf in that document
-        according to ntf_{t,d} = a + (1-a)\frac{tf_{t,d}}{tf_{max}(d)^{'}}.
-
-        The smoothing term $a$ damps the contribution of the second term - which may be viewed
-        as a scaling down of tf by the largest tf value in $d$
-        """
-        assert 0.0 <= smooth < 1.0
-
+    @staticmethod
+    def _compute_term_frequency(matrix, smooth=0.4):
         max_word_frequencies = numpy.max(matrix, axis=0)
         rows, cols = matrix.shape
         for row in range(rows):
@@ -100,7 +92,8 @@ class LsaSummarizer(BaseSummarizer):
 
         return matrix
 
-    def _compute_ranks(self, sigma, v_matrix):
+    @staticmethod
+    def _compute_ranks(sigma, v_matrix):
         assert len(sigma) == v_matrix.shape[0]
 
         dimensions = max(LsaSummarizer.MIN_DIMENSIONS,
