@@ -28,7 +28,8 @@ def read_article(file_json):
 
     return article
 
-def summarize_article(sentences):
+
+def summarize_article(sentences, query):
     summarizer = LsaSummarizer()
     summarizer.stop_words = stopwords.words('english')
     summary = summarizer(sentences, query, 3)
@@ -49,10 +50,11 @@ def generate_summary(request):
             'Access-Control-Max-Age': '3600'
         }
 
-        return ('', 204, headers)
+        return '', 204, headers
 
     # Set CORS headers for the main request
     cloud_logger.info("Received main request")
+
     headers = {
         'Access-Control-Allow-Origin': '*'
     }
@@ -60,4 +62,7 @@ def generate_summary(request):
     request_json = request.get_json(silent=True)
     sentences = read_article(request_json)
 
-    return json.dumps(summarize_article(sentences)), 200, headers
+    summary = summarize_article(sentences, "sample query")
+    cloud_logger.info("Finished summarization")
+
+    return json.dumps(summary), 200, headers

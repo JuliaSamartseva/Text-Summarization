@@ -10,6 +10,13 @@ from numpy.linalg import svd as singular_value_decomposition
 from base_summarizer import BaseSummarizer
 from sentence_similarity import SentenceSimilarity
 
+import os
+import pickle
+from google.cloud import storage
+
+# Download model from cloud storage bucket.
+model = None
+
 
 class LsaSummarizer(BaseSummarizer):
     MIN_DIMENSIONS = 3
@@ -25,7 +32,40 @@ class LsaSummarizer(BaseSummarizer):
     def stop_words(self, words):
         self._stop_words = words
 
+    # Download model file from cloud storage bucket
+    @staticmethod
+    def download_model_file():
+
+        from google.cloud import storage
+
+        # Model Bucket details
+        BUCKET_NAME = "sentence-transformer"
+        PROJECT_ID = "query-summarization"
+        GCS_MODEL_FILE = "model_pkl.pkl"
+
+        # Initialise a client
+        client = storage.Client(PROJECT_ID)
+
+        # Create a bucket object for our bucket
+        bucket = client.get_bucket(BUCKET_NAME)
+
+        # Create a blob object from the filepath
+        blob = bucket.blob(GCS_MODEL_FILE)
+
+        folder = '/tmp/'
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        # Download the file to a destination
+        blob.download_to_filename(folder + "local_model.pkl")
+
     def __call__(self, document, query, sentences_count):
+        # Use the global model variable
+        global model
+
+        if not model:
+            self.download_model_file()
+            model = pickle.load(open("/tmp/local_model.pkl", 'rb'))
+
         dictionary = self._create_dictionary(document)
 
         if not dictionary:
@@ -33,19 +73,16 @@ class LsaSummarizer(BaseSummarizer):
 
         sentences = sent_tokenize(document)
 
-        # If the query is not empty, module with the search for the most relevant sentences is started.
         if query:
-            sentence_similarity = SentenceSimilarity(sentences)
+            sentence_similarity = SentenceSimilarity(sentences, model)
             sentences = sentence_similarity.get_most_similar(query, 1)
 
-        matrix = LsaSummarizer._create_matrix(sentences, dictionary)
-        matrix = LsaSummarizer._compute_term_frequency(matrix)
-
-        # Singular Value Decomposition
+        matrix = self._create_matrix(document, dictionary)
+        matrix = self._compute_term_frequency(matrix)
         u, sigma, v = singular_value_decomposition(matrix, full_matrices=False)
 
         ranks = iter(self._compute_ranks(sigma, v))
-        return LsaSummarizer._get_best_sentences(sentences, sentences_count,
+        return self._get_best_sentences(sentences, sentences_count,
                                         lambda s: next(ranks))
 
     def _create_dictionary(self, document):

@@ -3,9 +3,8 @@ from sentence_transformers import SentenceTransformer
 
 
 class SentenceSimilarity:
-    def __init__(self, sentences):
-        # Initialize SBERT model.
-        self.model = SentenceTransformer("bert-base-nli-mean-tokens")
+    def __init__(self, sentences, model):
+        self.model = model
 
         self.sentences = sentences
 
