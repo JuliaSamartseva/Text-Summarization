@@ -20,11 +20,9 @@ function summarize() {
                     chrome.scripting.executeScript({
                         target: {tabId: tab.id, allFrames: false},
                         files: ['js/content.js'],
-                    }, function () {
-                        chrome.tabs.sendMessage(tab.id, {parameter: json});
-                    });
-                });
-                
+                    }, function () {});
+                    chrome.tabs.sendMessage(tab.id, {parameter: json});
+                });      
             });
         });
     });
