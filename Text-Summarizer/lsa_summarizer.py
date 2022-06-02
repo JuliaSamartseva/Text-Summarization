@@ -14,6 +14,16 @@ import os
 import pickle
 from google.cloud import storage
 
+from google.cloud import logging as cloudlogging
+import logging
+
+lg_client = cloudlogging.Client()
+
+lg_handler = lg_client.get_default_handler()
+cloud_logger = logging.getLogger("cloudLogger")
+cloud_logger.setLevel(logging.INFO)
+cloud_logger.addHandler(lg_handler)
+
 # Download model from cloud storage bucket.
 model = None
 
@@ -37,7 +47,6 @@ class LsaSummarizer(BaseSummarizer):
     def download_model_file():
 
         from google.cloud import storage
-
         # Model Bucket details
         BUCKET_NAME = "sentence-transformer"
         PROJECT_ID = "query-summarization"
@@ -63,8 +72,10 @@ class LsaSummarizer(BaseSummarizer):
         global model
 
         if not model:
+            cloud_logger.info("Loading model file from the cloud storage.")
             self.download_model_file()
             model = pickle.load(open("/tmp/local_model.pkl", 'rb'))
+            cloud_logger.info("Cloud model was initialised and finished download.")
 
         dictionary = self._create_dictionary(document)
 
@@ -75,7 +86,7 @@ class LsaSummarizer(BaseSummarizer):
 
         if query:
             sentence_similarity = SentenceSimilarity(sentences, model)
-            sentences = sentence_similarity.get_most_similar(query, 1)
+            sentences = sentence_similarity.get_most_similar(query)
 
         matrix = self._create_matrix(document, dictionary)
         matrix = self._compute_term_frequency(matrix)
