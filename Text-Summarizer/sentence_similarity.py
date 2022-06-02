@@ -1,5 +1,5 @@
-import scipy
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, util
+import torch
 
 
 class SentenceSimilarity:
@@ -8,23 +8,23 @@ class SentenceSimilarity:
 
         self.sentences = sentences
 
-        for s in sentences:
-            self.sentences.append(s)
-
         # Encode the sentences using SBERT module.
         self.embedded_sentences = self.model.encode(self.sentences)
 
-    def get_most_similar(self, query, threshold):
+    def get_most_similar(self, query):
         # Encode the query using SBERT module.
         query_embeddings = self.model.encode(query)
 
-        # Find cosine similarity between query and document sentences
-        cosine_dist = scipy.spatial.distance.cdist(query_embeddings, self.embedded_sentences, "cosine")
+        # Find dot distance between query and document sentences
+        dot_distance = util.dot_score(query_embeddings, self.embedded_sentences)[0]
 
-        # Choose sentences that have cosine similarity distance more than the threshold.
+        # Choose top sentences with the highest scores
+        sentences_number = len(self.sentences) 
+        top_k = int(sentences_number * 0.3)
+        top_results = torch.topk(dot_distance, k=top_k)
+
         result = []
-        for i, s in enumerate(self.sentences):
-            if cosine_dist[0][i] > threshold:
-                result.append(s)
+        for score, idx in zip(top_results[0], top_results[1]):
+            result.append(self.sentences[idx])
 
         return result

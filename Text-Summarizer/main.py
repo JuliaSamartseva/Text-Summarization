@@ -29,10 +29,10 @@ def read_article(file_json):
     return article
 
 
-def summarize_article(sentences, query):
+def summarize_article(sentences, query, number):
     summarizer = LsaSummarizer()
     summarizer.stop_words = stopwords.words('english')
-    summary = summarizer(sentences, query, 3)
+    summary = summarizer(sentences, query, number)
     cloud_logger.info("Finished summarization")
     return summary
 
@@ -60,9 +60,15 @@ def generate_summary(request):
     }
 
     request_json = request.get_json(silent=True)
+    text = request_json["text"]
+    query = request_json["query"]
+    number = request_json["number"]
+
+    cloud_logger.info(query) #REMOVE
+
     sentences = read_article(request_json)
 
-    summary = summarize_article(sentences, "sample query")
+    summary = summarize_article(sentences, query, number)
     cloud_logger.info("Finished summarization")
 
     return json.dumps(summary), 200, headers
