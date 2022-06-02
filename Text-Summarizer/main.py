@@ -18,13 +18,12 @@ cloud_logger.setLevel(logging.INFO)
 cloud_logger.addHandler(lg_handler)
 
 
-def read_article(file_json):
+def read_article(text):
     article = ''
-    filedata = json.dumps(file_json)
 
     # Process only short websites
-    if len(filedata) < 100000:
-        article = filedata.replace('\\n', " ")
+    if len(text) < 100000:
+        article = text.replace('\\n', " ")
 
     return article
 
@@ -66,7 +65,7 @@ def generate_summary(request):
 
     cloud_logger.info(query) #REMOVE
 
-    sentences = read_article(request_json)
+    sentences = read_article(text)
 
     summary = summarize_article(sentences, query, number)
     cloud_logger.info("Finished summarization")
