@@ -129,3 +129,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+Save-Model/model_pkl.pkl
