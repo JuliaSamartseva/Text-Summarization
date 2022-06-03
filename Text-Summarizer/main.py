@@ -58,7 +58,7 @@ def generate_summary(request):
         'Access-Control-Allow-Origin': '*'
     }
 
-    request_json = request.get_json(silent=True)
+    request_json = request.get_json(force=True)
     text = request_json["text"]
     query = request_json["query"]
     number = request_json["number"]

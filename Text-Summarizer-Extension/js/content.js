@@ -30,7 +30,7 @@ chrome.runtime.onMessage.addListener(function (message) {
         "https://us-central1-query-summarization.cloudfunctions.net/function-3",
         {
             method: "POST",
-            body: json,
+            body: JSON.stringify(json),
             headers: {
                 "Content-Type": "application/json",
             },
